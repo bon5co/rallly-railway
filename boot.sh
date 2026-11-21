@@ -13,7 +13,12 @@ export PORT="${PORT:-8080}" HOSTNAME=0.0.0.0
 export DATABASE_URL="postgresql://$DB_USER:$DB_PASS@$DB_HOST:5432/$DB_NAME"
 export NEXT_PUBLIC_BASE_URL="${NEXT_PUBLIC_BASE_URL:-https://$RAILWAY_PUBLIC_DOMAIN}"
 export AUTH_URL="$NEXT_PUBLIC_BASE_URL"
-export SUPPORT_EMAIL="${SUPPORT_EMAIL:-support@$RAILWAY_PUBLIC_DOMAIN}"
+# Rallly validates SUPPORT_EMAIL as an address with a top-level domain; a bare host such as localhost fails it and the server exits at boot.
+case "$RAILWAY_PUBLIC_DOMAIN" in
+  *.*) support_host="$RAILWAY_PUBLIC_DOMAIN" ;;
+  *) support_host="$RAILWAY_PUBLIC_DOMAIN.example" ;;
+esac
+export SUPPORT_EMAIL="${SUPPORT_EMAIL:-support@$support_host}"
 # sign-in by emailed code creates an account for any unknown address; with registration off the account hook refuses it
 export REGISTRATION_ENABLED=false
 unset DB_PASS
